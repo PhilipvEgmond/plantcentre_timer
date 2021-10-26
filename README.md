@@ -53,8 +53,14 @@ void loop() {
 - The PIN we're using is D5, change it's value in the code.
 - NUMPIXELS is the amount of pixels on your LEDstrip, change this to your own amount.
 - NUMPIXELS is quite long, I changed it to just NUM because you might be using it several times. 
-**NOTE:** Whenever you change a variable make sure to change it throughout the entirety of the code.
+**Careful:** Whenever you change a variable make sure to change it throughout the entirety of the code. The code would break otherwise.
 
 ## Step 4 - See if the code and LEDstrip work
 - Save the project.
 - Upload it by clicking on the arrow button.
+- Watch your LEDstrip light up!
+
+## Step 5 - Make a timed function
+In order for lights to fire up independently from each other we will need to make a function pause for some given time. Afterwards we can duplicate and adjust that code.
+
+- 
