@@ -52,7 +52,7 @@ void loop() {
 ### Personalise the code
 - The PIN we're using is D5, change it's value in the code.
 - NUMPIXELS is the amount of pixels on your LEDstrip, change this to your own amount.
-- NUMPIXELS is quite long, I changed it to just NUM because you might be using it several times. 
+- NUMPIXELS is quite long, I changed it to just NUM because we might be using it several times. 
 **Careful:** Whenever you change a variable make sure to change it throughout the entirety of the code. The code would break otherwise.
 
 ## Step 4 - See if the code and LEDstrip work
@@ -61,6 +61,47 @@ void loop() {
 - Watch your LEDstrip light up!
 
 ## Step 5 - Make a timed function
-In order for lights to fire up independently from each other we will need to make a function pause for some given time. Afterwards we can duplicate and adjust that code.
+In order for lights to fire up independently from each other we will need to make a function pause for some given time and reactivate after that. Then we can duplicate and adjust that code.
+
+- Let's first define a new timer function underneath loop() and move it's code to our new function as we won't be looping it regularly:
+```
+void loop() {
+
+}
+
+void timeOne() {
+ pixels.clear(); 
+
+  for(int i=0; i<NUM; i++) { 
+    pixels.setPixelColor(i, pixels.Color(0, 150, 0));
+    pixels.show(); 
+    delay(DELAYVAL);
+  }
+}
+```
+- To call upon this function write `timeOne();` in the setup() function. Your LEDstrip will go through one loop.
+- We can make a function loop itself by making it call upon itself at the end of the function. So add `timeOne();` add the bottom of itself.
+
+### Delay the function
+Here I encountered a problem. Adding a delay() doesn't pause the function it's called upon. It stops the entire code from running for a given time. This works fine if there's only one controller, but running several controllers at once would have the others pause too. 
+
+```
+void timeOne() {
+  pixels.clear(); 
+
+  for(int i=0; i<4; i++) { 
+    pixels.setPixelColor(i, pixels.Color(0, 150, 0));
+    pixels.show(); 
+    
+    delay(DELAYVAL); // <-- PROBLEM
+  }
+  timeOne();
+  delay(4000); // <-- PROBLEM
+}
+```
+
+Let's explore other options to delay a function. A quick Google returns libraries people have already made or Arduino's time function called millis(). Because libraries don't teach you much let's figure out how to use millis(). millis() holds the amount of milliseconds since the machine's bootup. This can be used to see how much time has passed.
 
 - 
+
+
