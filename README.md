@@ -1,7 +1,7 @@
 # plantcentre_timer
 IoT Assignment Manual where I try to figure out and explain how to activate separate running timers in Arduino to use as trigger, using a Neopixel LEDstrip as demonstration.
 
-## Materials
+## Components
 * NodeMCU
 * RGB LEDStrip
 * USB Cabel
@@ -59,7 +59,7 @@ void loop() {
 - Upload it by clicking on the arrow button.
 - Watch your LEDstrip light up!
 Not happening?
-- If you changed NUMPIXELS to NUM as well make sure you updated it everywhere.
+- If you changed NUMPIXELS to NUM as well make sure you update it everywhere.
 - Make sure all wires are hooked up correctly. If you're using different components, make sure you're using the correct PIN in your code.
 - Check if Adafruit Neopixel actually installed in the Library Manager.
 
@@ -72,7 +72,7 @@ void loop() {
 
 }
 
-void timeOne() {
+void time1() {
  pixels.clear(); 
 
   for(int i=0; i<NUM; i++) { 
@@ -82,14 +82,14 @@ void timeOne() {
   }
 }
 ```
-- To call upon this function write `timeOne();` in the setup() function. Your LEDstrip will go through one loop.
-- We can make a function loop itself by making it call upon itself at the end of the function. So add `timeOne();` add the bottom of itself.
+- To call upon this function write `time1();` in the setup() function. Your LEDstrip will go through one loop.
+- We can make a function loop itself by making it call upon itself at the end of the function. So add `time1();` add the bottom of itself.
 
 ### Delay the function
 Here I encountered a problem. Adding a delay() doesn't pause the function it's called upon. It stops the entire code from running for a given time. This works fine if there's only one controller, but running several controllers at once would have the others pause too. 
 
 ```
-void timeOne() {
+void time1() {
   pixels.clear(); 
 
   for(int i=0; i<4; i++) { 
@@ -98,19 +98,19 @@ void timeOne() {
     
     delay(DELAYVAL); // <-- PROBLEM
   }
-  timeOne();
+  time1();
   delay(4000); // <-- PROBLEM
 }
 ```
 
 Let's explore other options to delay a function. A quick Google returns libraries people have already made or Arduino's time function called millis(). Because libraries don't teach you much let's figure out how to use millis(). millis() holds the amount of milliseconds since the machine's bootup. This can be used to see how much time has passed. My original plan of waiting within a function before recalling itself won't work because we need to keep millis() updated. Looks like we're going back to loop().
 
-- Start by deleting old, unnecessary code: in setup() delete `timeOne();`, in timeOne() delete the delay()'s and `timeOne;` as we'll be looping through the loop function again.
+- Start by deleting old, unnecessary code: in setup() delete `time1();`, in time1() delete the delay()'s and `time1;` as we'll be looping through the loop function again.
 - First we need to declare some variables we'll be using as timer interval and to store trigger points in time. Above the setup() function write `const unsigned long interval1 = 3000;` and `unsigned long oldTime1 = 0;`.
 - Inside loop() declare a var to store the millis() in `unsigned long curTime = millis();`
 - Underneath we can check if the interval time has passed since last time the function fired:
 ```
-if (curTime - oldTime >= interval1) {
+if (curTime - oldTime1 >= interval1) {
     oldTime = curTime;
   }
 ```
@@ -123,3 +123,31 @@ Let's see if this works by checking the Serial.
 - Open the Serial Monitor with the button top right. **Note:** set the baud to 9600 as well. I got an empty monitor because I forgot the adjust it.
 - You'll see "check" written every 3 seconds.
 
+## Step 5 - Integrate Neopixel and duplicate
+Now let's see how we can use this timer to affect our Neopixel. We'll divide our Neopixel into 3 sections. Mine's got 13 LED's so I'm taking the number 4.
+- Within time1() change NUM to 4, it won't count past that now.
+- Underneath add `pixels.clear();` and `pixels.show();`. You should now see the first 4 LEDs flash every 3 seconds.
+- You can copy and paste this code to edit it for a different timer and different LEDs. That would look like this:
+
+```
+const unsigned long interval2 = 5000;
+unsigned long oldTime2 = 0;
+
+void loop() {
+  unsigned long curTime = millis();
+
+  if (curTime - oldTime2 >= interval2) {
+    time2();
+    oldTime2 = curTime;
+  }
+}
+
+void time2() {
+    for(int i=4; i<8; i++) { 
+    pixels.setPixelColor(i, pixels.Color(150, 0, 0));
+    pixels.show();   
+  }
+  pixels.clear();
+  pixels.show();
+}
+```
