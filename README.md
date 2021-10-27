@@ -108,7 +108,7 @@ Let's explore other options to delay a function. A quick Google returns librarie
 - Start by deleting old, unnecessary code: in setup() delete `time1();`, in time1() delete the delay()'s and `time1;` as we'll be looping through the loop function again.
 - First we need to declare some variables we'll be using as timer interval and to store trigger points in time. Above the setup() function write `const unsigned long interval1 = 3000;` and `unsigned long oldTime1 = 0;`.
 - Inside loop() declare a var to store the millis() in `unsigned long curTime = millis();`
-- Underneath we can check if the interval time has passed since last time the function fired:
+- Underneath we'll check if the interval time has passed since last time the function fired:
 ```
 if (curTime - oldTime1 >= interval1) {
     oldTime = curTime;
@@ -126,7 +126,7 @@ Let's see if this works by checking the Serial.
 ## Step 5 - Integrate Neopixel and duplicate
 Now let's see how we can use this timer to affect our Neopixel. We'll divide our Neopixel into 3 sections. Mine's got 13 LED's so I'm taking the number 4.
 - Within time1() change NUM to 4, it won't count past that now.
-- Underneath add `pixels.clear();` and `pixels.show();`. You should now see the first 4 LEDs flash every 3 seconds.
+- Underneath the for loop add `pixels.clear();` and `pixels.show();`. You should now see the first 4 LEDs flash every 3 seconds.
 - You can copy and paste this code to edit it for a different timer and different LEDs. That would look like this:
 
 ```
@@ -151,3 +151,28 @@ void time2() {
   pixels.show();
 }
 ```
+
+## Stuck
+I figured out how to trigger functions on intervals but not really how to delay functions, however. I would like the LEDs shining for a second and then turning off again. I found a method using an empty`while()` that runs nothing until a certain amount of millis have passed executing the code behind the while loop. I couldn't implement this into my time() functions because these run once and then update the oldTime. They don't get new millis() values so that wouldn't work in my case. 
+
+```
+void time1() {
+    for(int i=0; i<4; i++) { 
+    pixels.setPixelColor(i, pixels.Color(0, 150, 0));
+    pixels.show();   
+  }
+
+//       V Doesn't get updated
+  while (millis() < curTime + 1000){
+    
+  }
+  
+  pixels.clear();
+  pixels.show();
+}
+```
+
+## Sources
+Adafruit Neopixel Library
+Programming Electronics Academy - about millis(): https://www.youtube.com/watch?v=BYKQ9rk0FEQ&ab_channel=ProgrammingElectronicsAcademy
+Mads Aasvik - while loop delay - https://dzone.com/articles/arduino-using-millis-instead-of-delay
