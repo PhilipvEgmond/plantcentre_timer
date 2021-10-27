@@ -52,15 +52,18 @@ void loop() {
 ### Personalise the code
 - The PIN we're using is D5, change it's value in the code.
 - NUMPIXELS is the amount of pixels on your LEDstrip, change this to your own amount.
-- NUMPIXELS is quite long, I changed it to just NUM because we might be using it several times. 
-**Careful:** Whenever you change a variable make sure to change it throughout the entirety of the code. The code would break otherwise.
+- NUMPIXELS is quite long, I changed it to just NUM because we might be using it several times.
 
-## Step 4 - See if the code and LEDstrip work
+### Checkpoint - See if your LEDstrip lights up
 - Save the project.
 - Upload it by clicking on the arrow button.
 - Watch your LEDstrip light up!
+Not happening?
+- If you changed NUMPIXELS to NUM as well make sure you updated it everywhere.
+- Make sure all wires are hooked up correctly. If you're using different components, make sure you're using the correct PIN in your code.
+- Check if Adafruit Neopixel actually installed in the Library Manager.
 
-## Step 5 - Make a timed function
+## Step 4 - Make a timed function
 In order for lights to fire up independently from each other we will need to make a function pause for some given time and reactivate after that. Then we can duplicate and adjust that code.
 
 - Let's first define a new timer function underneath loop() and move it's code to our new function as we won't be looping it regularly:
@@ -100,8 +103,23 @@ void timeOne() {
 }
 ```
 
-Let's explore other options to delay a function. A quick Google returns libraries people have already made or Arduino's time function called millis(). Because libraries don't teach you much let's figure out how to use millis(). millis() holds the amount of milliseconds since the machine's bootup. This can be used to see how much time has passed.
+Let's explore other options to delay a function. A quick Google returns libraries people have already made or Arduino's time function called millis(). Because libraries don't teach you much let's figure out how to use millis(). millis() holds the amount of milliseconds since the machine's bootup. This can be used to see how much time has passed. My original plan of waiting within a function before recalling itself won't work because we need to keep millis() updated. Looks like we're going back to loop().
 
-- 
+- Start by deleting old, unnecessary code: in setup() delete `timeOne();`, in timeOne() delete the delay()'s and `timeOne;` as we'll be looping through the loop function again.
+- First we need to declare some variables we'll be using as timer interval and to store trigger points in time. Above the setup() function write `const unsigned long interval1 = 3000;` and `unsigned long oldTime1 = 0;`.
+- Inside loop() declare a var to store the millis() in `unsigned long curTime = millis();`
+- Underneath we can check if the interval time has passed since last time the function fired:
+```
+if (curTime - oldTime >= interval1) {
+    oldTime = curTime;
+  }
+```
+This if statement updates the old time whenever it runs. However, it only runs when interval1 time has passed. We can add code to this if statement to run after interval1.
 
+### Checkpoint - add Serial
+Let's see if this works by checking the Serial.
+- In setup() add `Serial.begin(9600);`.
+- Within the if statement write `Serial.println("check");` and upload the code.
+- Open the Serial Monitor with the button top right. **Note:** set the baud to 9600 as well. I got an empty monitor because I forgot the adjust it.
+- You'll see "check" written every 3 seconds.
 
